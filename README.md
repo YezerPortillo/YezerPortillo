@@ -1,0 +1,288 @@
+DROP TABLE ITEMS;
+DROP TABLE PARTS;
+DROP TABLE ORDERS;
+DROP TABLE CUSTOMERS;
+DROP TABLE SALESREPS;
+DROP TABLE PARTSLOG;
+DROP TABLE DETAILEDPARTSLOG;
+
+
+
+CREATE TABLE ITEMS
+ (O_ID  NUMBER(38)
+ ,ID  NUMBER(38)
+ ,P_ID  NUMBER(38) NOT NULL
+ ,QUANTITY  NUMBER(38) DEFAULT 1 NOT NULL
+ );
+
+CREATE TABLE PARTS
+ (ID  NUMBER(38)
+ ,DESCRIPTION  VARCHAR2(250) NOT NULL
+ ,UNITPRICE  NUMBER NOT NULL
+ ,ONHAND  NUMBER(38) NOT NULL
+ ,REORDER  VARCHAR2(40) NOT NULL
+ );
+
+CREATE TABLE CUSTOMERS
+ (ID  NUMBER(38)
+ ,LASTNAME  VARCHAR2(100) CONSTRAINT LASTNAME NOT NULL
+ ,FIRSTNAME  VARCHAR2(50) CONSTRAINT FIRSTNAME NOT NULL
+ ,COMPANYNAME  VARCHAR2(100)
+ ,STREET  VARCHAR2(100)
+ ,CITY  VARCHAR2(100)
+ ,STATE  VARCHAR2(50)
+ ,ZIPCODE  VARCHAR2(50)
+ ,PHONE  VARCHAR2(30)
+ ,FAX  VARCHAR2(30)
+ ,EMAIL  VARCHAR2(100)
+ ,S_ID  NUMBER(38) CONSTRAINT SALESREP NOT NULL
+ );
+
+CREATE TABLE SALESREPS
+ (ID  NUMBER(38)
+ ,LASTNAME  VARCHAR2(100) NOT NULL
+ ,FIRSTNAME  VARCHAR2(50) NOT NULL
+ ,COMMISSION  NUMBER(38) NOT NULL
+ );
+
+CREATE TABLE ORDERS
+ (ID  NUMBER(38)
+ ,C_ID  NUMBER(38) NOT NULL
+ ,ORDERDATE  DATE DEFAULT SYSDATE NOT NULL
+ ,SHIPDATE  DATE
+ ,PAIDDATE  DATE
+ ,STATUS  CHAR(1) DEFAULT 'F'
+ );
+
+CREATE TABLE PARTSLOG
+ (CHANGEDATE DATE
+ ,CHANGETYPE CHAR(1)
+ ,USERID VARCHAR2(50)
+ );
+
+CREATE TABLE DETAILEDPARTSLOG
+ (CHANGEDATE DATE
+ ,USERID VARCHAR2(50)
+ ,NEWID  NUMBER(38)
+ ,NEWDESCRIPTION  VARCHAR2(250) 
+ ,NEWUNITPRICE  NUMBER 
+ ,NEWONHAND  NUMBER(38) 
+ ,NEWREORDER  VARCHAR2(40) 
+ ,OLDID  NUMBER(38)
+ ,OLDDESCRIPTION  VARCHAR2(250) 
+ ,OLDUNITPRICE  NUMBER 
+ ,OLDONHAND  NUMBER(38) 
+ ,OLDREORDER  VARCHAR2(40) 
+ );
+
+ALTER TABLE ITEMS
+ ADD CONSTRAINT O_I_ID PRIMARY KEY 
+  (O_ID, ID) ;
+
+ALTER TABLE PARTS
+ ADD CONSTRAINT P_ID PRIMARY KEY 
+  (ID) ;
+
+ALTER TABLE CUSTOMERS
+ ADD CONSTRAINT C_ID PRIMARY KEY 
+  (ID) ;
+
+ALTER TABLE SALESREPS
+ ADD CONSTRAINT S_ID PRIMARY KEY 
+  (ID) ;
+
+ALTER TABLE ORDERS
+ ADD CONSTRAINT O_ID PRIMARY KEY 
+  (ID) ;
+
+ALTER TABLE PARTS
+ ADD CONSTRAINT PAR_DESCRIPTION UNIQUE 
+  (DESCRIPTION) ;
+
+ALTER TABLE CUSTOMERS
+ ADD CONSTRAINT CUS_NAME UNIQUE 
+  (LASTNAME
+  ,FIRSTNAME) ;
+     
+ALTER TABLE ITEMS
+ ADD CONSTRAINT PARTS_FK
+ FOREIGN KEY 
+  (P_ID)
+ REFERENCES PARTS
+  (ID)
+;
+
+ALTER TABLE ITEMS
+ ADD CONSTRAINT ORDERS_FK
+ FOREIGN KEY 
+  (O_ID)
+ REFERENCES ORDERS
+  (ID)
+;
+
+ALTER TABLE CUSTOMERS
+ ADD CONSTRAINT SALESREPS_FK
+ FOREIGN KEY 
+  (S_ID)
+ REFERENCES SALESREPS
+  (ID)
+;
+
+ALTER TABLE ORDERS
+ ADD CONSTRAINT CUSTOMERS_FK
+ FOREIGN KEY 
+  (C_ID)
+ REFERENCES CUSTOMERS
+  (ID)
+;
+
+-- PARTS
+
+INSERT INTO parts
+ VALUES (1,'Fax Machine',299,277,50);
+INSERT INTO parts
+ VALUES (2,'Copy Machine',4895,143,25);
+INSERT INTO parts
+ VALUES (3,'Laptop PC',2100,7631,1000);
+INSERT INTO parts
+ VALUES (4,'Desktop PC',1200,5903,1000);
+INSERT INTO parts
+ VALUES (5,'Scanner',99,490,200);
+COMMIT;
+
+-- SALESREPS
+INSERT INTO salesreps
+ VALUES (1,'Pratt','Nick',5);
+INSERT INTO salesreps
+ VALUES (2,'Jonah','Suzanne',5);
+INSERT INTO salesreps
+ VALUES (3,'Greenberg','Bara',5);
+COMMIT;
+
+-- CUSTOMERS
+INSERT INTO customers
+ VALUES (1,'Joy','Harold','McDonald Co.','4458 Stafford St.','Baltimore','MD','21209','410-983-5789',NULL,'harold_joy@mcdonald.com',3);
+INSERT INTO customers
+ VALUES (2,'Musial','Bill','Car Audio Center','12 Donna Lane','Reno','NV','89501','775-859-2121','775-859-2121','musial@car-audio.net',1);
+INSERT INTO customers
+ VALUES (3,'Sams','Danielle','Wise Trucking','489 Main St., #11','Hartford','CT','06103','203-955-4263','203-955-9532','danielle@wise.com',1);
+INSERT INTO customers
+ VALUES (4,'Elias','Juan','Rose Garden Inn','55 Condor Dr.','Dallas','TX','75252','214-907-3344','214-907-3188','jelias@rosegardeninnn.com',2);
+INSERT INTO customers
+ VALUES (5,'Foss','Betty','Foss Photography','446 Lincoln Ave.','Philadelphia','PA','19144','215-367-7746','215-543-9800','bfoss15@yahoo.com',3);
+INSERT INTO customers
+ VALUES (6,'Schaub','Greg','Pampered Pets','716 Heritage Ave., #4A','Phoenix','AZ','85023','602-617-7321','602-617-7321','pamperedpets@msn.com',3);
+INSERT INTO customers
+ VALUES (7,'Wiersbicki','Joseph','Key Locksmith','122 83rd Ave.','Brooklyn','NY','11220','718-445-8452','718-445-8799','joe@keylocksmith.com',1);
+INSERT INTO customers
+ VALUES (8,'Ayers','Jack','Park View Insurance','2 Curtis Lane','Topeka','KS','66604','785-707-4120',NULL,'jayers@parkview.com',3);
+INSERT INTO customers
+ VALUES (9,'Clay','Dorothy','Kenser Corp.','57623 A St.','Sacramento','CA','95821','916-672-8700','916-672-8753','dorothy.clay@kenser.com',1);
+INSERT INTO customers
+ VALUES (10,'Haagensen','Dave','Dave''s Tree Service','874 Lafayette Rd.','Cleveland','OH','44124','216-578-2347',NULL,'chopchop@excite.com',1);
+COMMIT; 
+
+-- ORDERS and ITEMS
+INSERT INTO orders
+ VALUES (1,1,to_date('18-JUN-99','dd-mon-RRRR'),to_date('18-JUN-99','dd-mon-RRRR'),to_date('30-JUN-99','dd-mon-RRRR'),'F');
+INSERT INTO items
+ VALUES (1,1,3,1);
+INSERT INTO items
+ VALUES (1,2,2,1);
+INSERT INTO items
+ VALUES (1,3,5,1);
+COMMIT;
+
+INSERT INTO orders
+ VALUES (2,2,to_date('18-JUN-99','dd-mon-RRRR'),NULL,NULL,'B');
+INSERT INTO items
+ VALUES (2,1,1,2);
+INSERT INTO items
+ VALUES (2,2,4,2);
+INSERT INTO items
+ VALUES (2,3,5,2);
+COMMIT;
+
+INSERT INTO orders
+ VALUES (3,3,to_date('18-JUN-99','dd-mon-RRRR'),to_date('18-JUN-99','dd-mon-RRRR'),to_date('21-JUN-99','dd-mon-RRRR'),'F');
+INSERT INTO items
+ VALUES (3,1,3,1);
+COMMIT;
+
+INSERT INTO orders
+ VALUES (4,4,to_date('19-JUN-99','dd-mon-RRRR'),to_date('21-JUN-99','dd-mon-RRRR'),to_date('21-JUN-99','dd-mon-RRRR'),'F');
+INSERT INTO items
+ VALUES (4,1,5,1);
+COMMIT;
+
+INSERT INTO orders
+ VALUES (5,5,to_date('19-JUN-99','dd-mon-RRRR'),to_date('19-JUN-99','dd-mon-RRRR'),to_date('28-JUN-99','dd-mon-RRRR'),'F');
+INSERT INTO items
+ VALUES (5,1,2,1);
+INSERT INTO items
+ VALUES (5,2,3,1);
+COMMIT;
+
+INSERT INTO orders
+ VALUES (6,6,to_date('19-JUN-99','dd-mon-RRRR'),to_date('19-JUN-99','dd-mon-RRRR'),NULL,'F');
+INSERT INTO items
+ VALUES (6,1,4,1);
+COMMIT;
+
+INSERT INTO orders
+ VALUES (7,7,to_date('19-JUN-99','dd-mon-RRRR'),NULL,NULL,'B');
+INSERT INTO items
+ VALUES (7,1,1,1);
+COMMIT;
+
+INSERT INTO orders
+ VALUES (8,8,to_date('20-JUN-99','dd-mon-RRRR'),to_date('20-JUN-99','dd-mon-RRRR'),to_date('20-JUN-99','dd-mon-RRRR'),'F');
+INSERT INTO items
+ VALUES (8,1,5,10);
+COMMIT;
+
+INSERT INTO orders
+ VALUES (9,9,to_date('21-JUN-99','dd-mon-RRRR'),NULL,NULL,'B');
+INSERT INTO items
+ VALUES (9,1,1,2);
+INSERT INTO items
+ VALUES (9,2,4,2);
+INSERT INTO items
+ VALUES (9,3,5,2);
+COMMIT;
+
+INSERT INTO orders
+ VALUES (10,2,to_date('21-JUN-99','dd-mon-RRRR'),to_date('22-JUN-99','dd-mon-RRRR'),to_date('22-JUN-99','dd-mon-RRRR'),'F');
+INSERT INTO items
+ VALUES (10,1,2,1);
+INSERT INTO items
+ VALUES (10,2,3,1);
+COMMIT;
+
+INSERT INTO orders
+ VALUES (11,4,to_date('22-JUN-99','dd-mon-RRRR'),to_date('22-JUN-99','dd-mon-RRRR'),NULL,'F');
+INSERT INTO items
+ VALUES (11,1,3,2);
+INSERT INTO items
+ VALUES (11,2,2,2);
+INSERT INTO items
+ VALUES (11,3,5,2);
+COMMIT;
+
+INSERT INTO orders
+ VALUES (12,7,to_date('22-JUN-99','dd-mon-RRRR'),to_date('23-JUN-99','dd-mon-RRRR'),to_date('30-JUN-99','dd-mon-RRRR'),'F');
+INSERT INTO items
+ VALUES (12,1,4,1);
+COMMIT;
+
+INSERT INTO orders
+ VALUES (13,4,to_date('22-JUN-99','dd-mon-RRRR'),NULL,NULL,'B');
+INSERT INTO items
+ VALUES (13,1,5,1);
+COMMIT;
+
+INSERT INTO orders
+ VALUES (14,1,to_date('23-JUN-99','dd-mon-RRRR'),to_date('25-JUN-99','dd-mon-RRRR'),NULL,'F');
+INSERT INTO items
+ VALUES (14,1,2,1);
+COMMIT;
